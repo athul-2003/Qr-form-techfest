@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Form</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"></script>
+    <style>
+        /* Additional styles for the hidden ID card */
+        .form-page {
+            position: relative;
+        }
+
+        .form-submitted .form-page {
+            background-color: #e8f0ff; /* Set the background color of the form page when the form is submitted */
+        }
+
+        /* Additional styles for the hidden ID card */
+        .hidden-card {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 999;
+            background: linear-gradient(to right, #add8e6, #e6e6ff);
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1), 0px 6px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .hidden-card .card {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hidden-card .photo {
+            width: 150px;
+            height: 150px;
+            overflow: hidden;
+            border-radius: 50%;
+            border: thick solid white;
+            margin-right: 20px;
+        }
+
+        .hidden-card .photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .hidden-card .content {
+            text-align: left;
+        }
+
+        .hidden-card h1,
+        .hidden-card h3,
+        .hidden-card p {
+            font-weight: bold;
+            color: #1a1a1a;
+        }
+
+        #downloadBtn {
+            display: block;
+            margin-top: 20px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="form-page">
+        <div class="inner-box">
+            <h1>Sign Up</h1>
+            <form id="formId" onsubmit="validateForm(event)">
+                <!-- Your form content -->
+                <label for="name">Name:</label>
+                <input type="text" id="name" class="entry" required>
+
+                <label for="email">Class:</label>
+                <input type="text" id="email" class="entry" required pattern="[A-Za-z0-9]+">
+
+                <label for="dob">Student Id:</label>
+                <input type="text" class="entry" id="dob" required pattern="[A-Za-z0-9]+">
+
+                <label for="photo">Photo:</label>
+                <input type="file" id="photo" accept="image/*" required>
+
+                <div class="button-div">
+                    <button>Submit</button>
+                </div>
+                <div id="successMessage" style="margin-top: 1em; font-weight: bold;"></div>
+            </form>
+        </div>
+
+        <!-- Hidden ID Card Section -->
+        <div id="hiddenCard" class="hidden-card">
+            <div class="card">
+                <div class="photo">
+                    <img id="hiddenPhotoPreview" src="placeholder-image.jpg" alt="profile-photo">
+                </div>
+                <div class="content">
+                    <h1 id="hiddenUserName">Full Name</h1>
+                    <h3 id="hiddenUserClass">Class</h3>
+                    <p id="hiddenUserId">Student ID</p>
+                </div>
+            </div>
+            <button id="downloadBtn" onclick="downloadIDCard()">Download ID Card</button>
+        </div>
+    </div>
+
+    <script>
+        function validateForm(event) {
+            event.preventDefault();
+
+            // Get user input
+            var userName = document.getElementById('name').value;
+            var userClass = document.getElementById('email').value;
+            var userId = document.getElementById('dob').value;
+
+            // Update hidden ID card with user details
+            document.getElementById('hiddenUserName').innerText = userName;
+            document.getElementById('hiddenUserClass').innerText = 'Class: ' + userClass;
+            document.getElementById('hiddenUserId').innerText = 'Student ID: ' + userId;
+
+            // Update photo on hidden ID card
+            var inputPhoto = document.getElementById('photo');
+            var hiddenPhotoPreview = document.getElementById('hiddenPhotoPreview');
+
+            if (inputPhoto.files && inputPhoto.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    hiddenPhotoPreview.src = e.target.result;
+                }
+                reader.readAsDataURL(inputPhoto.files[0]);
+            }
+
+            // Display the hidden ID card
+            document.getElementById('hiddenCard').style.display = 'block';
+        }
+
+        function downloadIDCard() {
+            var hiddenCard = document.getElementById('hiddenCard');
+
+            // Convert the HTML content of the hidden card to an image
+            domtoimage.toBlob(hiddenCard, { filter: excludeButton })
+                .then(function (blob) {
+                    // Create a link element to trigger the download
+                    var link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = 'ID_Card.png';
+                    link.click();
+
+                    // Hide the download button
+                    document.getElementById('downloadBtn').style.display = 'none';
+                });
+
+            // Function to filter out the download button
+            function excludeButton(node) {
+                return (node.id !== 'downloadBtn') ? node : false;
+            }
+        }
+    </script>
+
+</body>
+
+</html>
+
+
